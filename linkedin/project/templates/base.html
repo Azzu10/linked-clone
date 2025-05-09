@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LinkedIn Clone{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+    {% block head %}{% endblock %}
+</head>
+<body>
+    {% if current_user.is_authenticated %}
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="{{ url_for('feed') }}" class="navbar-brand">
+                    <i class="fab fa-linkedin" style="color: #0A66C2; font-size: 2rem;"></i>
+                </a>
+                
+                <div class="navbar-search position-relative">
+                    <form id="search-form" action="{{ url_for('search') }}" method="GET">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="search-input" name="q" placeholder="Search for people, jobs, companies, and more...">
+                    </form>
+                </div>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a href="{{ url_for('feed') }}" class="nav-link {% if request.endpoint == 'feed' %}active{% endif %}">
+                            <i class="fas fa-home nav-icon"></i>
+                            <span class="nav-text">Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('connections') }}" class="nav-link {% if request.endpoint == 'connections' %}active{% endif %}">
+                            <i class="fas fa-user-friends nav-icon"></i>
+                            <span class="nav-text">My Network</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('jobs') }}" class="nav-link {% if request.endpoint == 'jobs' %}active{% endif %}">
+                            <i class="fas fa-briefcase nav-icon"></i>
+                            <span class="nav-text">Jobs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('messages') }}" class="nav-link {% if request.endpoint == 'messages' %}active{% endif %}">
+                            <i class="fas fa-comment-dots nav-icon"></i>
+                            <span class="nav-text">Messaging</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('notifications') }}" class="nav-link {% if request.endpoint == 'notifications' %}active{% endif %}">
+                            <i class="fas fa-bell nav-icon"></i>
+                            <span class="nav-text">Notifications</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('profile', user_id=current_user.id) }}" class="nav-link">
+                            <img src="{{ url_for('static', filename='uploads/' + current_user.profile_picture) }}" alt="{{ current_user.first_name }}" class="avatar avatar-sm">
+                            <span class="nav-text">Me</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <button id="mobile-menu-toggle" class="btn-text d-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </nav>
+            
+            <div id="mobile-menu" class="hidden">
+                <ul class="navbar-nav-mobile">
+                    <li class="nav-item">
+                        <a href="{{ url_for('feed') }}" class="nav-link">
+                            <i class="fas fa-home nav-icon"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('connections') }}" class="nav-link">
+                            <i class="fas fa-user-friends nav-icon"></i>
+                            <span>My Network</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('jobs') }}" class="nav-link">
+                            <i class="fas fa-briefcase nav-icon"></i>
+                            <span>Jobs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('messages') }}" class="nav-link">
+                            <i class="fas fa-comment-dots nav-icon"></i>
+                            <span>Messaging</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('notifications') }}" class="nav-link">
+                            <i class="fas fa-bell nav-icon"></i>
+                            <span>Notifications</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('profile', user_id=current_user.id) }}" class="nav-link">
+                            <i class="fas fa-user nav-icon"></i>
+                            <span>Profile</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('logout') }}" class="nav-link">
+                            <i class="fas fa-sign-out-alt nav-icon"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+    {% endif %}
+    
+    <main>
+        <div class="container">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="flash-message">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+    
+    {% if current_user.is_authenticated %}
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <div class="footer-column">
+                    <h4 class="footer-heading">LinkedIn Clone</h4>
+                    <a href="#" class="footer-link">About</a>
+                    <a href="#" class="footer-link">Community Guidelines</a>
+                    <a href="#" class="footer-link">Privacy & Terms</a>
+                    <a href="#" class="footer-link">Sales Solutions</a>
+                    <a href="#" class="footer-link">Safety Center</a>
+                </div>
+                
+                <div class="footer-column">
+                    <h4 class="footer-heading">Navigate</h4>
+                    <a href="{{ url_for('feed') }}" class="footer-link">Home</a>
+                    <a href="{{ url_for('jobs') }}" class="footer-link">Jobs</a>
+                    <a href="{{ url_for('connections') }}" class="footer-link">My Network</a>
+                    <a href="{{ url_for('messages') }}" class="footer-link">Messaging</a>
+                    <a href="{{ url_for('notifications') }}" class="footer-link">Notifications</a>
+                </div>
+                
+                <div class="footer-column">
+                    <h4 class="footer-heading">Business Services</h4>
+                    <a href="#" class="footer-link">Talent Solutions</a>
+                    <a href="#" class="footer-link">Marketing Solutions</a>
+                    <a href="#" class="footer-link">Learning Solutions</a>
+                    <a href="#" class="footer-link">Sales Solutions</a>
+                    <a href="#" class="footer-link">Post a Job</a>
+                </div>
+                
+                <div class="footer-column">
+                    <h4 class="footer-heading">Accounts</h4>
+                    <a href="#" class="footer-link">Settings</a>
+                    <a href="{{ url_for('profile', user_id=current_user.id) }}" class="footer-link">My Profile</a>
+                    <a href="#" class="footer-link">Help Center</a>
+                    <a href="{{ url_for('logout') }}" class="footer-link">Sign Out</a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 LinkedIn Clone. This is a clone project for educational purposes only.</p>
+            </div>
+        </div>
+    </footer>
+    {% endif %}
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

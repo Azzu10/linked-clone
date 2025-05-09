@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Add Education - LinkedIn Clone{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h1>Add Education</h1>
+    </div>
+    
+    <div class="card-body">
+        <form action="{{ url_for('add_education') }}" method="POST">
+            <div class="form-group">
+                <label for="school">School</label>
+                <input type="text" id="school" name="school" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="degree">Degree</label>
+                <input type="text" id="degree" name="degree">
+            </div>
+            
+            <div class="form-group">
+                <label for="field_of_study">Field of Study</label>
+                <input type="text" id="field_of_study" name="field_of_study">
+            </div>
+            
+            <div class="form-group">
+                <div class="checkbox-item mb-2">
+                    <input type="checkbox" id="is_current" name="is_current" class="is-current-checkbox" data-controls="end_date">
+                    <label for="is_current">I am currently studying here</label>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="start_date">Start Date</label>
+                        <input type="date" id="start_date" name="start_date" required>
+                    </div>
+                </div>
+                
+                <div class="col">
+                    <div class="form-group">
+                        <label for="end_date">End Date</label>
+                        <input type="date" id="end_date" name="end_date">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="5"></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a href="{{ url_for('profile', user_id=current_user.id) }}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

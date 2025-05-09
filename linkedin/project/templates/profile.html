@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.first_name }} {{ user.last_name }} - LinkedIn Clone{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Main content -->
+    <div class="col-9">
+        <!-- Profile header -->
+        <div class="profile-header card">
+            <div class="profile-background">
+                <img src="{{ url_for('static', filename='uploads/' + user.background_image) }}" alt="Background">
+            </div>
+            
+            <div class="profile-picture">
+                <img src="{{ url_for('static', filename='uploads/' + user.profile_picture) }}" alt="{{ user.first_name }}">
+            </div>
+            
+            <div class="profile-info">
+                <div class="profile-details">
+                    <h1 class="profile-name">{{ user.first_name }} {{ user.last_name }}</h1>
+                    <p class="profile-headline">{{ user.headline or 'No headline added yet' }}</p>
+                    <p class="profile-location">{{ user.location or 'No location added yet' }}</p>
+                    
+                    <div class="profile-connections mb-3">
+                        <a href="{{ url_for('connections') if is_self else '#' }}">
+                            {{ user.connections_made.count() }} connections
+                        </a>
+                    </div>
+                    
+                    <div class="profile-actions">
+                        {% if is_self %}
+                            <a href="{{ url_for('edit_profile') }}" class="btn btn-outline">Edit Profile</a>
+                        {% else %}
+                            <form action="{{ url_for('connect', user_id=user.id) }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn {% if is_connected %}btn-outline{% else %}btn-primary{% endif %}">
+                                    {% if is_connected %}Connected{% else %}Connect{% endif %}
+                                </button>
+                            </form>
+                            <a href="{{ url_for('conversation', user_id=user.id) }}" class="btn btn-outline">Message</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- About section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2>About</h2>
+                {% if is_self %}
+                    <a href="{{ url_for('edit_profile') }}" class="btn-text">
+                        <i class="fas fa-pencil-alt"></i>
+                    </a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if user.about %}
+                    <p>{{ user.about }}</p>
+                {% else %}
+                    <p class="text-secondary">No information added yet.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Experience section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2>Experience</h2>
+                {% if is_self %}
+                    <a href="{{ url_for('add_experience') }}" class="btn-text">
+                        <i class="fas fa-plus"></i>
+                    </a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if experiences %}
+                    {% for experience in experiences %}
+                        <div class="timeline-item">
+                            <div class="timeline-icon"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <h3 class="timeline-title">{{ experience.title }}</h3>
+                                    <div class="timeline-subtitle">{{ experience.company }} • {{ experience.location }}</div>
+                                    <div class="timeline-date">
+                                        {{ experience.start_date.strftime('%B %Y') }} - 
+                                        {% if experience.is_current %}
+                                            Present
+                                        {% else %}
+                                            {{ experience.end_date.strftime('%B %Y') }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% if experience.description %}
+                                    <p>{{ experience.description }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-secondary">No experience added yet.</p>
+                    {% if is_self %}
+                        <a href="{{ url_for('add_experience') }}" class="btn btn-outline">Add experience</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Education section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2>Education</h2>
+                {% if is_self %}
+                    <a href="{{ url_for('add_education') }}" class="btn-text">
+                        <i class="fas fa-plus"></i>
+                    </a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if educations %}
+                    {% for education in educations %}
+                        <div class="timeline-item">
+                            <div class="timeline-icon"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <h3 class="timeline-title">{{ education.school }}</h3>
+                                    <div class="timeline-subtitle">{{ education.degree }} • {{ education.field_of_study }}</div>
+                                    <div class="timeline-date">
+                                        {{ education.start_date.strftime('%B %Y') }} - 
+                                        {% if education.is_current %}
+                                            Present
+                                        {% else %}
+                                            {{ education.end_date.strftime('%B %Y') }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% if education.description %}
+                                    <p>{{ education.description }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-secondary">No education added yet.</p>
+                    {% if is_self %}
+                        <a href="{{ url_for('add_education') }}" class="btn btn-outline">Add education</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Skills section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2>Skills</h2>
+                {% if is_self %}
+                    <button type="button" class="btn-text" data-toggle="modal" data-target="#addSkillModal">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="skills-section">
+                    {% if skills %}
+                        {% for skill in skills %}
+                            <div class="skill-badge">
+                                {{ skill.name }} 
+                                <span class="skill-endorsements">{{ skill.endorsements }}</span>
+                                {% if not is_self and is_connected %}
+                                    <form action="{{ url_for('endorse_skill', skill_id=skill.id) }}" method="POST" class="d-inline">
+                                        <button type="submit" class="btn-text p-0 ml-1">
+                                            <i class="far fa-thumbs-up"></i>
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-secondary">No skills added yet.</p>
+                    {% endif %}
+                </div>
+                
+                {% if is_self %}
+                    <form action="{{ url_for('add_skill') }}" method="POST" class="mt-3">
+                        <div class="flex">
+                            <input type="text" name="skill_name" placeholder="Add a skill" class="mb-0 mr-2">
+                            <button type="submit" class="btn btn-primary">Add</button>
+                        </div>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Posts section -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Posts</h2>
+            </div>
+            <div class="card-body">
+                {% if posts %}
+                    {% for post in posts %}
+                        <div class="post mb-4 {% if not loop.last %}border-bottom pb-4{% endif %}">
+                            <div class="post-header">
+                                <div class="post-avatar">
+                                    <img src="{{ url_for('static', filename='uploads/' + post.author.profile_picture) }}" alt="{{ post.author.first_name }}" class="avatar">
+                                </div>
+                                <div class="post-user-info">
+                                    <div class="post-user-name">{{ post.author.first_name }} {{ post.author.last_name }}</div>
+                                    <div class="post-user-headline">{{ post.author.headline }}</div>
+                                    <div class="post-time">{{ post.created_at.strftime('%B %d, %Y at %I:%M %p') }}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="post-content">
+                                <p>{{ post.content }}</p>
+                            </div>
+                            
+                            {% if post.image %}
+                                <div class="post-image">
+                                    <img src="{{ url_for('static', filename='uploads/' + post.image) }}" alt="Post image">
+                                </div>
+                            {% endif %}
+                            
+                            <div class="post-stats">
+                                <span class="likes-count" data-post-id="{{ post.id }}">{{ post.likes.count() }} {{ 'like' if post.likes.count() == 1 else 'likes' }}</span>
+                                &nbsp;•&nbsp;
+                                <span class="comments-count" data-post-id="{{ post.id }}" data-count="{{ post.comments.count() }}">{{ post.comments.count() }} {{ 'comment' if post.comments.count() == 1 else 'comments' }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-secondary">No posts yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Right sidebar -->
+    <div class="col-3">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>People also viewed</h3>
+            </div>
+            <div class="card-body">
+                <!-- This would be dynamically populated based on user data -->
+                <p class="text-secondary">Suggested connections will appear here based on profile views.</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h3>You may be interested in</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h4 class="mb-1">Groups</h4>
+                    <p class="text-secondary">Join professional groups to connect with like-minded individuals.</p>
+                </div>
+                
+                <div class="mb-3">
+                    <h4 class="mb-1">Events</h4>
+                    <p class="text-secondary">Discover events that can help you grow professionally.</p>
+                </div>
+                
+                <div>
+                    <h4 class="mb-1">Courses</h4>
+                    <p class="text-secondary">Learn new skills to advance your career.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

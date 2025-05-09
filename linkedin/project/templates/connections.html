@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}My Network - LinkedIn Clone{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h1>My Connections</h1>
+    </div>
+    
+    <div class="card-body">
+        <div class="connections-stats mb-4">
+            <h3>{{ connections|length }} Connections</h3>
+        </div>
+        
+        {% if connections %}
+            <div class="row">
+                {% for connection in connections %}
+                    <div class="col-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <div class="mb-3">
+                                    <img src="{{ url_for('static', filename='uploads/' + connection.profile_picture) }}" alt="{{ connection.first_name }}" class="avatar avatar-lg">
+                                </div>
+                                <h3 class="mb-1">{{ connection.first_name }} {{ connection.last_name }}</h3>
+                                <p class="text-secondary mb-3">{{ connection.headline or 'No headline' }}</p>
+                                <p class="text-tertiary mb-3">{{ connection.location or 'No location' }}</p>
+                                
+                                <div class="connection-actions">
+                                    <a href="{{ url_for('profile', user_id=connection.id) }}" class="btn btn-outline mb-2 w-100">View Profile</a>
+                                    <a href="{{ url_for('conversation', user_id=connection.id) }}" class="btn btn-primary w-100">Message</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center p-5">
+                <i class="fas fa-user-friends mb-3" style="font-size: 3rem; color: #0A66C2;"></i>
+                <h3 class="mb-3">No connections yet</h3>
+                <p class="text-secondary mb-4">Start building your professional network by connecting with people you know.</p>
+                <a href="{{ url_for('search') }}?q=" class="btn btn-primary">Find people to connect with</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

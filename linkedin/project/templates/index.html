@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}LinkedIn Clone - Welcome{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-logo">
+        <i class="fab fa-linkedin" style="color: #0A66C2; font-size: 4rem;"></i>
+    </div>
+    
+    <h1 class="auth-heading">Welcome to your professional community</h1>
+    
+    <div class="auth-actions">
+        <a href="{{ url_for('login') }}" class="btn btn-primary w-100 mb-3">Sign In</a>
+        <a href="{{ url_for('register') }}" class="btn btn-outline w-100">Register</a>
+    </div>
+    
+    <div class="auth-features mt-5">
+        <h3 class="mb-3">Connect with professionals</h3>
+        <ul>
+            <li class="mb-2">Find and connect with colleagues, classmates, and friends</li>
+            <li class="mb-2">Build your professional network to advance your career</li>
+            <li class="mb-2">Discover new job opportunities that match your skills</li>
+            <li class="mb-2">Share your knowledge and insights with your network</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "messages.html" %}
+
+{% block title %}Conversation with {{ partner.first_name }} - LinkedIn Clone{% endblock %}
+
+{% block content %}
+{{ super() }}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Initialize the conversation view
+    document.addEventListener('DOMContentLoaded', function() {
+        const messagesCol = document.querySelector('.col-9');
+        
+        if (messagesCol) {
+            // Create conversation header
+            const conversationHeader = document.createElement('div');
+            conversationHeader.className = 'conversation-header';
+            conversationHeader.innerHTML = `
+                <div class="conversation-avatar">
+                    <img src="{{ url_for('static', filename='uploads/' + partner.profile_picture) }}" alt="{{ partner.first_name }}" class="avatar">
+                </div>
+                <div>
+                    <div class="conversation-user">{{ partner.first_name }} {{ partner.last_name }}</div>
+                    <div class="conversation-status">{{ partner.headline or '' }}</div>
+                </div>
+            `;
+            
+            // Create messages list
+            const messagesList = document.createElement('div');
+            messagesList.className = 'messages-list';
+            messagesList.id = 'messages-container';
+            
+            {% for message in messages %}
+                const message{{ loop.index }} = document.createElement('div');
+                message{{ loop.index }}.className = 'message-bubble {% if message.sender_id == current_user.id %}message-outgoing{% else %}message-incoming{% endif %}';
+                message{{ loop.index }}.textContent = '{{ message.content }}';
+                messagesList.appendChild(message{{ loop.index }});
+            {% endfor %}
+            
+            // Create message form
+            const messageForm = document.createElement('form');
+            messageForm.id = 'message-form';
+            messageForm.className = 'message-form';
+            messageForm.setAttribute('data-partner-id', '{{ partner.id }}');
+            messageForm.innerHTML = `
+                <input type="text" id="message-input" name="content" class="message-input" placeholder="Write a message...">
+                <button type="submit" class="btn btn-primary">Send</button>
+            `;
+            
+            // Append all elements to the messages column
+            const conversationContainer = document.createElement('div');
+            conversationContainer.className = 'conversation';
+            conversationContainer.appendChild(conversationHeader);
+            conversationContainer.appendChild(messagesList);
+            conversationContainer.appendChild(messageForm);
+            messagesCol.innerHTML = '';
+            messagesCol.appendChild(conversationContainer);
+            
+            // Scroll to bottom of messages
+            messagesList.scrollTop = messagesList.scrollHeight;
+            
+            // Initialize message form submission
+            initMessageSending();
+        }
+    });
+</script>
+{% endblock %}

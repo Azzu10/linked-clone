@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Post a Job - LinkedIn Clone{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h1>Post a Job</h1>
+    </div>
+    
+    <div class="card-body">
+        <form action="{{ url_for('post_job') }}" method="POST">
+            <div class="form-group">
+                <label for="title">Job Title</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="company">Company</label>
+                <input type="text" id="company" name="company" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="job_type">Job Type</label>
+                <select id="job_type" name="job_type" required>
+                    <option value="Full-time">Full-time</option>
+                    <option value="Part-time">Part-time</option>
+                    <option value="Contract">Contract</option>
+                    <option value="Internship">Internship</option>
+                    <option value="Temporary">Temporary</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="salary_range">Salary Range</label>
+                <input type="text" id="salary_range" name="salary_range" placeholder="e.g., $50,000 - $70,000">
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Job Description</label>
+                <textarea id="description" name="description" rows="10" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="requirements">Requirements</label>
+                <textarea id="requirements" name="requirements" rows="10" required></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Post Job</button>
+                <a href="{{ url_for('jobs') }}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
